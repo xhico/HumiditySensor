@@ -16,46 +16,24 @@ import Adafruit_DHT
 DHT_SENSOR = Adafruit_DHT.DHT22
 DHT_PIN = 4
 
-# Humidity && Temperature Lists
-humidityList = []
-temperatureList = []
-
-# 60 records = 60 mins
-maxRecords = 60
-
 # Run forever!
 while True:
-
     # Get humidity, temperature and date now
     date_now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
     humidity = round(humidity, 1)
     temperature = round(temperature, 1)
-    humidityList.append(humidity)
-    temperatureList.append(temperature)
 
-    # Get only the last 60 records
-    if len(humidityList) == maxRecords + 1:
-        humidityList = humidityList[len(humidityList) - maxRecords:len(humidityList)]
-        temperatureList = temperatureList[len(temperatureList) - maxRecords:len(temperatureList)]
-
-    # Calculate Avg for Humidity and Temperature
-    humidityAvg = round(sum(humidityList) / len(humidityList), 1)
-    temperatureAvg = round(sum(temperatureList) / len(temperatureList), 1)
+    # Save info to file
+    with open('/home/pi/RaspberryPiHumiditySensor/HumiditySensor.txt', mode='w') as csvFile:
+        csvFile.writelines(["date" + ",humidity" + "," + "temperature", "\n", str(date_now) + "," + str(humidity) + "," + str(temperature)])
+    csvFile.close()
 
     # Prints
     print("Date = " + str(date_now))
     print("Humidity = " + str(humidity) + "%")
     print("Temperature = " + str(temperature) + "C")
-    print("Humidity Avg = " + str(humidityAvg) + "%")
-    print("Temperature Avg = " + str(temperatureAvg) + "C")
     print("")
-
-    # Save info to file
-    with open('/home/pi/RaspberryPiHumiditySensor/HumiditySensor.txt', mode='w') as csvFile:
-        csvFile.writelines(["date" + ",humidity" + "," + "temperature" + ",humidityAvg" + "," + "temperatureAvg", "\n",
-                            str(date_now) + "," + str(humidity) + "," + str(temperature) + "," + str(humidityAvg) + "," + str(temperatureAvg)])
-    csvFile.close()
 
     # Wait 60 secs
     time.sleep(60)
