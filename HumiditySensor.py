@@ -27,6 +27,7 @@ while True:
         csvFile.writelines(["date" + ",humidity" + "," + "temperature", "\n", date_now + "," + humidity + "," + temperature])
     csvFile.close()
 
+    # print("Date = " + date_now + "%")
     # print("Humidity = " + humidity + "%")
     # print("Temperature = " + temperature + "C")
     time.sleep(60)
