@@ -4,6 +4,7 @@
 # elif match.group(1) == 'BCM2711':
 #    return 3
 
+import datetime
 import time
 
 import Adafruit_DHT
@@ -13,6 +14,7 @@ DHT_PIN = 4
 
 while True:
     humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
+    date_now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
     if humidity is not None and temperature is not None:
         humidity = str(round(humidity, 1))
@@ -22,7 +24,7 @@ while True:
         temperature = "-1"
 
     with open('/home/pi/RaspberryPiHumiditySensor/HumiditySensor.txt', mode='w') as csvFile:
-        csvFile.writelines(["humidity" + "," + "temperature", "\n", humidity + "," + temperature])
+        csvFile.writelines(["date" + ",humidity" + "," + "temperature", "\n", date_now + "," + humidity + "," + temperature])
     csvFile.close()
 
     # print("Humidity = " + humidity + "%")
