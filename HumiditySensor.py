@@ -8,7 +8,6 @@
 #    return 3
 
 import datetime
-import time
 
 import Adafruit_DHT
 
@@ -16,24 +15,19 @@ import Adafruit_DHT
 DHT_SENSOR = Adafruit_DHT.DHT22
 DHT_PIN = 4
 
-# Run forever!
-while True:
-    # Get humidity, temperature and date now
-    date_now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
-    humidity = round(humidity, 1)
-    temperature = round(temperature, 1)
+# Get humidity, temperature and date now
+date_now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
+humidity = round(humidity, 1)
+temperature = round(temperature, 1)
 
-    # Save info to file
-    with open('/home/pi/RaspberryPiHumiditySensor/HumiditySensor.txt', mode='w') as csvFile:
-        csvFile.writelines(["date" + ",humidity" + "," + "temperature", "\n", str(date_now) + "," + str(humidity) + "," + str(temperature)])
-    csvFile.close()
+# Save info to file
+with open('/home/pi/RaspberryPiHumiditySensor/HumiditySensor.txt', mode='w') as csvFile:
+    csvFile.writelines(["date" + ",humidity" + "," + "temperature", "\n", str(date_now) + "," + str(humidity) + "," + str(temperature)])
+csvFile.close()
 
-    # Prints
-    print("Date = " + str(date_now))
-    print("Humidity = " + str(humidity) + "%")
-    print("Temperature = " + str(temperature) + "C")
-    print("")
-
-    # Wait 60 secs
-    time.sleep(60)
+# Prints
+print("Date = " + str(date_now))
+print("Humidity = " + str(humidity) + "%")
+print("Temperature = " + str(temperature) + "C")
+print("")
