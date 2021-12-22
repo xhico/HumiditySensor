@@ -2,13 +2,13 @@
 # !/usr/bin/python3
 
 # https://pimylifeup.com/raspberry-pi-humidity-sensor-dht22/
-# python3 -m pip install Adafruit_DHT pyTelegramBotAPI --no-cache-dir
+# python3 -m pip install Adafruit_DHT yagmail --no-cache-dir
 # nano /home/pi/.local/lib/python3.7/site-packages/Adafruit_DHT/platform_detect.py
 # elif match.group(1) == 'BCM2711':
 #    return 3
 
 import json
-import telebot
+import yagmail
 import datetime
 import Adafruit_DHT
 
@@ -20,9 +20,10 @@ def get911(key):
     return data[key]
 
 
-TELEGRAM_TOKEN = get911('TELEGRAM_TOKEN')
-TELEGRAM_CHAT_ID = get911('TELEGRAM_CHAT_ID')
-bot = telebot.TeleBot(TELEGRAM_TOKEN)
+EMAIL_USER = get911('EMAIL_USER')
+EMAIL_APPPW = get911('EMAIL_APPPW')
+EMAIL_RECEIVER = get911('EMAIL_RECEIVER')
+
 
 # Sensor Settings
 DHT_SENSOR = Adafruit_DHT.DHT22
@@ -49,13 +50,13 @@ if __name__ == "__main__":
     # # Prints
     # print("Date = " + str(date_now))
     # print("Humidity = " + str(humidity) + "%")
-    # print("Temperature = " + str(temperature) + "C")
+    # print("Temperature = " + str(temperature) + "°C")
     # print("")
 
     # Check if room is on FIRE!!!
     if temperature > 20:
-        msg = bot.send_message(TELEGRAM_CHAT_ID,
-                               "FIRE!! FIRE!! FIRE!!\n" +
-                               "Temperature: " + str(temperature) + "\n" +
-                               "Date: " + str(date_now)
-                               )
+        yagmail.SMTP(EMAIL_USER, EMAIL_APPPW).send(EMAIL_RECEIVER, "FIRE!! FIRE!! FIRE!!",
+                                                   "Temperature: " + str(temperature) + + "°C" "\n" +
+                                                   "Humidity: " + str(humidity) + "%" + "\n" +
+                                                   "Date: " + str(date_now)
+                                                   )
