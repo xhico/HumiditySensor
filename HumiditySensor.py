@@ -24,7 +24,6 @@ EMAIL_USER = get911('EMAIL_USER')
 EMAIL_APPPW = get911('EMAIL_APPPW')
 EMAIL_RECEIVER = get911('EMAIL_RECEIVER')
 
-
 # Sensor Settings
 DHT_SENSOR = Adafruit_DHT.DHT22
 DHT_PIN = 4
@@ -42,7 +41,7 @@ if __name__ == "__main__":
         temperature = "None"
 
     # Save info to file
-    with open('/home/pi/RaspberryPiHumiditySensor/HumiditySensor.txt', mode='w') as csvFile:
+    with open('/home/pi/HumiditySensor/HumiditySensor.txt', mode='w') as csvFile:
         csvFile.writelines(["date" + ",humidity" + "," + "temperature", "\n",
                             str(date_now) + "," + str(humidity) + "," + str(temperature)])
     csvFile.close()
