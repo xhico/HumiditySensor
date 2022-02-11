@@ -7,10 +7,11 @@
 # elif match.group(1) == 'BCM2711':
 #    return 3
 
-import json
-import yagmail
 import datetime
+import json
+
 import Adafruit_DHT
+import yagmail
 
 
 def get911(key):
@@ -36,7 +37,18 @@ if __name__ == "__main__":
         humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
         humidity = round(humidity, 1)
         temperature = round(temperature, 1)
-    except:
+        print("Humidity: " + str(humidity))
+        print("Temperature: " + str(temperature))
+        
+        # Check if room is on FIRE!!!
+        if temperature > 20:
+            yagmail.SMTP(EMAIL_USER, EMAIL_APPPW).send(EMAIL_RECEIVER, "FIRE!! FIRE!! FIRE!!",
+                                                       "Temperature: " + str(temperature) + "°C" "\n" +
+                                                       "Humidity: " + str(humidity) + "%" + "\n" +
+                                                       "Date: " + str(date_now)
+                                                       )
+    except Exception as ex:
+        print(ex)
         humidity = "None"
         temperature = "None"
 
@@ -46,16 +58,4 @@ if __name__ == "__main__":
                             str(date_now) + "," + str(humidity) + "," + str(temperature)])
     csvFile.close()
 
-    # # Prints
-    # print("Date = " + str(date_now))
-    # print("Humidity = " + str(humidity) + "%")
-    # print("Temperature = " + str(temperature) + "°C")
-    # print("")
 
-    # Check if room is on FIRE!!!
-    if temperature > 20:
-        yagmail.SMTP(EMAIL_USER, EMAIL_APPPW).send(EMAIL_RECEIVER, "FIRE!! FIRE!! FIRE!!",
-                                                   "Temperature: " + str(temperature) + + "°C" "\n" +
-                                                   "Humidity: " + str(humidity) + "%" + "\n" +
-                                                   "Date: " + str(date_now)
-                                                   )
