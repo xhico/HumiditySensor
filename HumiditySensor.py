@@ -40,7 +40,7 @@ if __name__ == "__main__":
         print("Temperature: " + str(temperature))
         
         # Check if room is on FIRE!!!
-        if temperature > 20:
+        if temperature > 30:
             yagmail.SMTP(EMAIL_USER, EMAIL_APPPW).send(EMAIL_RECEIVER, "FIRE!! FIRE!! FIRE!!",
                                                        "Temperature: " + str(temperature) + "°C" "\n" +
                                                        "Humidity: " + str(humidity) + "%" + "\n" +
