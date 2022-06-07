@@ -29,19 +29,24 @@ if __name__ == "__main__":
     date_now = str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
 
     # Get Sensor Info
-    temp_c, temp_f, humidity, valid = DHT_SENSOR.read().values()
-    temp_c, temp_f, humidity, valid = str(temp_c), str(temp_f), str(humidity), str(valid)
+    try:
+        temp_c, temp_f, humidity, valid = DHT_SENSOR.read().values()
+        temp_c, temp_f, humidity, valid = str(temp_c), str(temp_f), str(humidity), str(valid)
+
+        # Check if room is on FIRE!!!
+        if int(float(temp_c)) > 30:
+            bodyContent = "temp_c: " + temp_c + "°C" + "\n" + "temp_f: " + temp_f + "°F" + "\n" + "Humidity: " + humidity + "%" + "\n" + "Date: " + date_now + "\n" + "Valid: " + valid
+            yagmail.SMTP(EMAIL_USER, EMAIL_APPPW).send(EMAIL_RECEIVER, "FIRE!! FIRE!! FIRE!!", bodyContent)
+
+    except Exception:
+        temp_c, temp_f, humidity, valid = "None", "None", "None", "None"
+
+
+    # Save info to file
     print("temp_c: " + temp_c)
     print("temp_f: " + temp_f)
     print("Humidity: " + humidity)
     print("Valid: " + valid)
-    
-    # Check if room is on FIRE!!!
-    if int(float(temp_c)) > 30:
-        bodyContent = "temp_c: " + temp_c + "°C" + "\n" + "temp_f: " + temp_f + "°F" + "\n" + "Humidity: " + humidity + "%" + "\n" + "Date: " + date_now + "\n" + "Valid: " + valid
-        yagmail.SMTP(EMAIL_USER, EMAIL_APPPW).send(EMAIL_RECEIVER, "FIRE!! FIRE!! FIRE!!", bodyContent)
-
-    # Save info to file
     with open('/home/pi/HumiditySensor/HumiditySensor.txt', mode='w') as csvFile:
         csvFile.writelines(["date, temp_c, temp_f, humidity, valid\n", date_now + ", " + temp_c + ", " + temp_f, ", " + humidity + ", " + valid])
 
