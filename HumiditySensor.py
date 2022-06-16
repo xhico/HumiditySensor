@@ -40,6 +40,9 @@ def getTemp():
 
 
 def main():
+    print("----------------------------------------------------")
+    print(str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")))
+
     # Get humidity, temperature and date now
     date_now = str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
 
