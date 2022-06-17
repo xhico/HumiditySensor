@@ -44,7 +44,7 @@ def main():
     print(str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")))
 
     # Get humidity, temperature and date now
-    date_now = str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
+    date_now = str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M"))
 
     # Get Sensor Info
     temp_c, temp_f, humidity, valid = getTemp()
@@ -64,9 +64,12 @@ def main():
         sendMain(temp_c, temp_f, humidity, date_now)
 
     # Save info to file
-    LOG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "HumiditySensor.txt"))
-    with open(LOG_FILE, mode='w') as csvFile:
-        csvFile.writelines(["date, temp_c, temp_f, humidity, valid\n", date_now + ", " + temp_c + ", " + temp_f, ", " + humidity + ", " + valid])
+    LOG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "HumiditySensor.json"))
+    with open(LOG_FILE) as inFile:
+        data = list(reversed(json.load(inFile)))
+        data.append({"date": date_now, "temp_c": temp_c, "temp_f": temp_f, "humidity": humidity, "valid": valid})
+    with open(LOG_FILE, "w") as outFile:
+        json.dump(list(reversed(data)), outFile, indent=2)
 
 
 if __name__ == "__main__":
