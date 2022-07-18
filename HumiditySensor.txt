@@ -1,2 +1,0 @@
-date, temp_c, temp_f, humidity, valid
-2022/06/07 12:14:34, 22.9, 73.2, 58.5, True
