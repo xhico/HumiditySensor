@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/python3
 
+# python3 -m pip install yagmail pigpio-dht --no-cache-dir
 import datetime
 import json
 import yagmail
