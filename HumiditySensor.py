@@ -2,27 +2,21 @@
 # !/usr/bin/python3
 
 # python3 -m pip install yagmail pigpio-dht --no-cache-dir
+
+import os
 import datetime
 import json
+import traceback
+
 import yagmail
+import logging
 from pigpio_dht import DHT22
-import os
 
 
 def get911(key):
     with open('/home/pi/.911') as f:
         data = json.load(f)
     return data[key]
-
-
-# Email Settings
-EMAIL_USER = get911('EMAIL_USER')
-EMAIL_APPPW = get911('EMAIL_APPPW')
-EMAIL_RECEIVER = get911('EMAIL_RECEIVER')
-
-# Sensor Settings
-DHT_PIN = 4
-DHT_SENSOR = DHT22(DHT_PIN)
 
 
 def sendMain(temp_c, temp_f, humidity, date_now):
@@ -41,9 +35,6 @@ def getTemp():
 
 
 def main():
-    print("----------------------------------------------------")
-    print(str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")))
-
     # Get humidity, temperature and date now
     date_now = str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M"))
 
@@ -53,25 +44,50 @@ def main():
     # Retry if failed
     counter = 1
     while (valid == "None" or valid == "False") and counter < 5:
-        print(counter, "Retry")
+        logger.info(counter, "Retry")
         temp_c, temp_f, humidity, valid = getTemp()
         counter += 1
 
-    print("temp_c: " + temp_c + "\n" + "temp_f: " + temp_f + "\n" + "Humidity: " + humidity + "\n" + "Valid: " + valid)
+    logger.info("temp_c: " + temp_c)
+    logger.info("temp_f: " + temp_f)
+    logger.info("Humidity: " + humidity)
+    logger.info("Valid: " + valid)
 
     # Check if room is on FIRE!!!
     if int(float(temp_c)) > 30 and temp_c != "None":
-        print("Fire")
+        logger.info("Fire")
         sendMain(temp_c, temp_f, humidity, date_now)
 
     # Save info to file
-    LOG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "HumiditySensor.json"))
-    with open(LOG_FILE) as inFile:
+    CONFIG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "HumiditySensor.json"))
+    with open(CONFIG_FILE) as inFile:
         data = list(reversed(json.load(inFile)))
         data.append({"date": date_now, "temp_c": temp_c, "temp_f": temp_f, "humidity": humidity, "valid": valid})
-    with open(LOG_FILE, "w") as outFile:
+    with open(CONFIG_FILE, "w") as outFile:
         json.dump(list(reversed(data)), outFile, indent=2)
 
 
 if __name__ == "__main__":
-    main()
+    # Set Logging
+    LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.abspath(__file__).replace(".py", ".log"))
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", handlers=[logging.FileHandler(LOG_FILE), logging.StreamHandler()])
+    logger = logging.getLogger()
+
+    logger.info("----------------------------------------------------")
+
+    # Email Settings
+    EMAIL_USER = get911('EMAIL_USER')
+    EMAIL_APPPW = get911('EMAIL_APPPW')
+    EMAIL_RECEIVER = get911('EMAIL_RECEIVER')
+
+    # Sensor Settings
+    DHT_PIN = 4
+    DHT_SENSOR = DHT22(DHT_PIN)
+
+    try:
+        main()
+    except Exception as ex:
+        logger.error(traceback.format_exc())
+        yagmail.SMTP(EMAIL_USER, EMAIL_APPPW).send(EMAIL_RECEIVER, "Error - " + os.path.basename(__file__), str(traceback.format_exc()))
+    finally:
+        logger.info("End")
