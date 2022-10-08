@@ -7,16 +7,11 @@ import os
 import datetime
 import json
 import traceback
-
+import base64
 import yagmail
 import logging
 from pigpio_dht import DHT22
-
-
-def get911(key):
-    with open('/home/pi/.911') as f:
-        data = json.load(f)
-    return data[key]
+from Misc import get911
 
 
 def sendMain(temp_c, temp_f, humidity, date_now):
