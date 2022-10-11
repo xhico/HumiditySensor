@@ -54,7 +54,9 @@ def main():
         sendMain(temp_c, temp_f, humidity, date_now)
 
     # Save info to file
-    CONFIG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "HumiditySensor.json"))
+    if not os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, "w") as outFile:
+            json.dump(list(reversed({})), outFile, indent=2)
     with open(CONFIG_FILE) as inFile:
         data = list(reversed(json.load(inFile)))
         data.append({"date": date_now, "temp_c": temp_c, "temp_f": temp_f, "humidity": humidity, "valid": valid})
@@ -78,6 +80,8 @@ if __name__ == "__main__":
     # Sensor Settings
     DHT_PIN = 4
     DHT_SENSOR = DHT22(DHT_PIN)
+    
+    CONFIG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "HumiditySensor.json"))
 
     try:
         main()
