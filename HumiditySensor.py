@@ -20,12 +20,8 @@ def sendMain(temp_c, temp_f, humidity, date_now):
 
 
 def getTemp():
-    try:
-        temp_c, temp_f, humidity, valid = DHT_SENSOR.read().values()
-        temp_c, temp_f, humidity, valid = str(temp_c), str(temp_f), str(humidity), str(valid)
-    except Exception:
-        temp_c, temp_f, humidity, valid = "None", "None", "None", "None"
-
+    temp_c, temp_f, humidity, valid = DHT_SENSOR.read().values()
+    temp_c, temp_f, humidity, valid = temp_c, temp_f, humidity, str(valid)
     return temp_c, temp_f, humidity, valid
 
 
@@ -43,13 +39,8 @@ def main():
         temp_c, temp_f, humidity, valid = getTemp()
         counter += 1
 
-    logger.info("temp_c: " + temp_c)
-    logger.info("temp_f: " + temp_f)
-    logger.info("Humidity: " + humidity)
-    logger.info("Valid: " + valid)
-
     # Check if room is on FIRE!!!
-    if int(float(temp_c)) > 30 and temp_c != "None":
+    if int(float(temp_c)) > 30:
         logger.info("Fire")
         sendMain(temp_c, temp_f, humidity, date_now)
 
@@ -80,7 +71,7 @@ if __name__ == "__main__":
     # Sensor Settings
     DHT_PIN = 4
     DHT_SENSOR = DHT22(DHT_PIN)
-    
+
     CONFIG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "HumiditySensor.json"))
 
     try:
