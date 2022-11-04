@@ -7,21 +7,18 @@ import os
 import datetime
 import json
 import traceback
-import base64
 import yagmail
 import logging
 from pigpio_dht import DHT22
 from Misc import get911
 
 
-def sendMain(temp_c, temp_f, humidity, date_now):
-    bodyContent = "temp_c: " + temp_c + "°C" + "\n" + "temp_f: " + temp_f + "°F" + "\n" + "Humidity: " + humidity + "%" + "\n" + "Date: " + date_now
-    yagmail.SMTP(EMAIL_USER, EMAIL_APPPW).send(EMAIL_RECEIVER, "FIRE!! FIRE!! FIRE!!", bodyContent)
-
-
 def getTemp():
-    temp_c, temp_f, humidity, valid = DHT_SENSOR.read().values()
-    temp_c, temp_f, humidity, valid = temp_c, temp_f, humidity, str(valid)
+    try:
+        temp_c, temp_f, humidity, valid = DHT_SENSOR.read().values()
+        valid = str(valid)
+    except Exception:
+        temp_c, temp_f, humidity, valid = "None", "None", "None", "None"
     return temp_c, temp_f, humidity, valid
 
 
@@ -38,11 +35,6 @@ def main():
         logger.info(counter, "Retry")
         temp_c, temp_f, humidity, valid = getTemp()
         counter += 1
-
-    # Check if room is on FIRE!!!
-    if int(float(temp_c)) > 30:
-        logger.info("Fire")
-        sendMain(temp_c, temp_f, humidity, date_now)
 
     # Save info to file
     if not os.path.exists(CONFIG_FILE):
