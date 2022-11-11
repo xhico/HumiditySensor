@@ -36,7 +36,11 @@ def main():
         temp_c, temp_f, humidity, valid = getTemp()
         counter += 1
 
-    # Save info to file
+    if valid == "None" or valid == "False":
+        logger.error("Couldn't get info")
+        return
+
+        # Save info to file
     if not os.path.exists(CONFIG_FILE):
         with open(CONFIG_FILE, "w") as outFile:
             json.dump(list(reversed({})), outFile, indent=2)
