@@ -14,6 +14,7 @@ from Misc import get911
 
 
 def getTemp():
+    """Get temperature and humidity from DHT22 sensor."""
     try:
         temp_c, temp_f, humidity, valid = DHT_SENSOR.read().values()
         valid = str(valid)
