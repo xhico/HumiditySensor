@@ -1,0 +1,12 @@
+[Unit]
+Description=HumiditySensor Service
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/HumiditySensor/
+ExecStart=/usr/bin/python3 /home/pi/HumiditySensor/HumiditySensor.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
