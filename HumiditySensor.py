@@ -2,6 +2,7 @@
 # !/usr/bin/python3
 
 # python3 -m pip install yagmail pigpio-dht --no-cache-dir
+# sudo apt install pigpiod -y
 
 import os
 import datetime
