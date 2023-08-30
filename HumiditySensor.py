@@ -5,10 +5,9 @@ import os
 import datetime
 import json
 import traceback
-import yagmail
 import logging
 from pigpio_dht import DHT22
-from Misc import get911
+from Misc import get911, sendErrorEmail
 
 
 def getTemp():
@@ -103,6 +102,6 @@ if __name__ == "__main__":
         main()
     except Exception as ex:
         logger.error(traceback.format_exc())
-        yagmail.SMTP(EMAIL_USER, EMAIL_APPPW).send(EMAIL_RECEIVER, "Error - " + os.path.basename(__file__), str(traceback.format_exc()))
+        sendErrorEmail(os.path.basename(__file__), str(traceback.format_exc()))
     finally:
         logger.info("End")
