@@ -53,6 +53,7 @@ def main():
     date_now = str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M"))
 
     # Get Sensor Info
+    logger.info("Get Sensor Info")
     temp_c, temp_f, humidity, valid = getTemp()
 
     # Retry if failed
@@ -62,9 +63,14 @@ def main():
         temp_c, temp_f, humidity, valid = getTemp()
         counter += 1
 
+    # Failed to measure -> exit
     if valid == "None" or valid == "False":
-        logger.error("Couldn't get info")
+        logger.error("Failed to measure -> exit")
         return
+
+    # Log currMeasurements
+    currMeasurements = {"date": date_now, "temp_c": temp_c, "temp_f": temp_f, "humidity": humidity, "valid": valid}
+    logger.info(currMeasurements)
 
     # Save info to file
     if not os.path.exists(CONFIG_FILE):
@@ -74,7 +80,7 @@ def main():
     with open(CONFIG_FILE) as inFile:
         # read the existing data from the file and append the new data to it
         data = list(reversed(json.load(inFile)))
-        data.append({"date": date_now, "temp_c": temp_c, "temp_f": temp_f, "humidity": humidity, "valid": valid})
+        data.append(currMeasurements)
     with open(CONFIG_FILE, "w") as outFile:
         # write the updated data back to the file
         json.dump(list(reversed(data)), outFile, indent=2)
