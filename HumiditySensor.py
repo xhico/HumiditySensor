@@ -100,7 +100,7 @@ if __name__ == "__main__":
     EMAIL_RECEIVER = get911('EMAIL_RECEIVER')
 
     # Sensor Settings
-    CONFIG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "HumiditySensor.json"))
+    CONFIG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json"))
     DHT_PIN = 4
     DHT_SENSOR = DHT22(DHT_PIN)
 
