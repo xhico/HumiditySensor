@@ -73,16 +73,18 @@ def main():
     logger.info(currMeasurements)
 
     # Save info to file
-    if not os.path.exists(CONFIG_FILE):
+    if not os.path.exists(SAVED_INFO_FILE):
         # if the file doesn't exist, create a new empty list
-        with open(CONFIG_FILE, "w") as outFile:
+        with open(SAVED_INFO_FILE, "w") as outFile:
             json.dump(list(reversed({})), outFile, indent=2)
-    with open(CONFIG_FILE) as inFile:
-        # read the existing data from the file and append the new data to it
+
+    # read the existing data from the file and append the new data to it
+    with open(SAVED_INFO_FILE) as inFile:
         data = list(reversed(json.load(inFile)))
         data.append(currMeasurements)
-    with open(CONFIG_FILE, "w") as outFile:
-        # write the updated data back to the file
+
+    # write the updated data back to the file
+    with open(SAVED_INFO_FILE, "w") as outFile:
         json.dump(list(reversed(data)), outFile, indent=2)
 
 
@@ -100,7 +102,7 @@ if __name__ == "__main__":
     EMAIL_RECEIVER = get911('EMAIL_RECEIVER')
 
     # Sensor Settings
-    CONFIG_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json"))
+    SAVED_INFO_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "saved_info.json"))
     DHT_PIN = 4
     DHT_SENSOR = DHT22(DHT_PIN)
 
