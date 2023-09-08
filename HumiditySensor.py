@@ -7,7 +7,7 @@ import json
 import traceback
 import logging
 from pigpio_dht import DHT22
-from Misc import get911, sendErrorEmail
+from Misc import get911, sendEmail
 
 
 def getTemp():
@@ -96,11 +96,6 @@ if __name__ == "__main__":
 
     logger.info("----------------------------------------------------")
 
-    # Email Settings
-    EMAIL_USER = get911('EMAIL_USER')
-    EMAIL_APPPW = get911('EMAIL_APPPW')
-    EMAIL_RECEIVER = get911('EMAIL_RECEIVER')
-
     # Sensor Settings
     SAVED_INFO_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "saved_info.json"))
     DHT_PIN = 4
@@ -110,6 +105,6 @@ if __name__ == "__main__":
         main()
     except Exception as ex:
         logger.error(traceback.format_exc())
-        sendErrorEmail(os.path.basename(__file__), str(traceback.format_exc()))
+        sendEmail(os.path.basename(__file__), str(traceback.format_exc()))
     finally:
         logger.info("End")
