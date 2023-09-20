@@ -29,6 +29,8 @@ def getTemp():
     except Exception:
         # if an error occurs, set all values to "None"
         temp_c, temp_f, humidity, valid = "None", "None", "None", "None"
+
+    valid = "False" if temp_c == 0.0 or temp_f == 0.0 or humidity == 0.0 else valid
     return temp_c, temp_f, humidity, valid  # return a tuple of four values
 
 
