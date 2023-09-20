@@ -10,28 +10,29 @@ from pigpio_dht import DHT22
 from Misc import get911, sendEmail
 
 
-def getTemp():
+def read_dht22_sensor():
     """
-    Reads the temperature and humidity from the DHT22 sensor.
+    Read temperature and humidity values from the DHT22 sensor.
 
     Returns:
-    temp_c (float): temperature in Celsius
-    temp_f (float): temperature in Fahrenheit
-    humidity (float): relative humidity in percentage
-    valid (str): "True" if the reading is valid, "False" if not
+        temp_c (float): Temperature in Celsius.
+        temp_f (float): Temperature in Fahrenheit.
+        humidity (float): Relative humidity in percentage.
+        is_valid (str): "True" if the reading is valid, "False" if not.
 
     If an error occurs while reading the sensor, all values are set to "None".
     """
     try:
-        # read temperature, humidity, and validity from DHT22 sensor
-        temp_c, temp_f, humidity, valid = DHT_SENSOR.read().values()
-        valid = str(valid)  # convert boolean value to string "True" or "False"
+        # Read temperature, humidity, and validity from DHT22 sensor
+        temp_c, temp_f, humidity, is_valid = DHT_SENSOR.read().values()
+        is_valid = str(is_valid)  # Convert boolean value to string "True" or "False"
     except Exception:
-        # if an error occurs, set all values to "None"
-        temp_c, temp_f, humidity, valid = "None", "None", "None", "None"
+        # If an error occurs, set all values to "None"
+        temp_c, temp_f, humidity, is_valid = "None", "None", "None", "None"
 
-    valid = "False" if temp_c == 0.0 or temp_f == 0.0 or humidity == 0.0 else valid
-    return temp_c, temp_f, humidity, valid  # return a tuple of four values
+    # Mark the reading as invalid if any of the values is zero
+    is_valid = "False" if temp_c == 0.0 or temp_f == 0.0 or humidity == 0.0 else is_valid
+    return temp_c, temp_f, humidity, is_valid  # Return a tuple of four values
 
 
 def main():
@@ -56,13 +57,13 @@ def main():
 
     # Get Sensor Info
     logger.info("Get Sensor Info")
-    temp_c, temp_f, humidity, valid = getTemp()
+    temp_c, temp_f, humidity, valid = read_dht22_sensor()
 
     # Retry if failed
     counter = 1
     while (valid == "None" or valid == "False") and counter < 5:
         logger.info(counter, "Retry")
-        temp_c, temp_f, humidity, valid = getTemp()
+        temp_c, temp_f, humidity, valid = read_dht22_sensor()
         counter += 1
 
     # Failed to measure -> exit
