@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     # Sensor Settings
     SAVED_INFO_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "saved_info.json"))
-    DHT_PIN = 4
+    DHT_PIN = 14
     DHT_SENSOR = DHT22(DHT_PIN)
 
     try:
