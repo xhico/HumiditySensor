@@ -1,0 +1,11 @@
+{
+  "MAX_RETRIES": 5,
+  "RPI4": {
+    "SENSOR_DHT22_PIN": false,
+    "SENSE_HAT": true
+  },
+  "RPI3A": {
+    "SENSOR_DHT22_PIN": 14,
+    "SENSE_HAT": false
+  }
+}

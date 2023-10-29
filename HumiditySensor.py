@@ -4,10 +4,12 @@
 import os
 import datetime
 import json
+import socket
 import traceback
 import logging
 from pigpio_dht import DHT22
 from Misc import get911, sendEmail
+from sense_hat import SenseHat
 
 
 def read_dht22_sensor():
@@ -20,19 +22,53 @@ def read_dht22_sensor():
         humidity (float): Relative humidity in percentage.
         is_valid (str): "True" if the reading is valid, "False" if not.
 
-    If an error occurs while reading the sensor, all values are set to "None".
+    If an error occurs while reading the sensor, all values are set to "None."
     """
-    try:
-        # Read temperature, humidity, and validity from DHT22 sensor
-        temp_c, temp_f, humidity, is_valid = DHT_SENSOR.read().values()
-        is_valid = str(is_valid)  # Convert boolean value to string "True" or "False"
-    except Exception:
-        # If an error occurs, set all values to "None"
-        temp_c, temp_f, humidity, is_valid = "None", "None", "None", "None"
 
-    # Mark the reading as invalid if any of the values is zero
-    is_valid = "False" if temp_c == 0.0 or temp_f == 0.0 or humidity == 0.0 else is_valid
-    return temp_c, temp_f, humidity, is_valid  # Return a tuple of four values
+    counter = 0
+    while counter < MAX_RETRIES:
+        try:
+            # Read temperature, humidity, and validity from DHT22 sensor
+            DHT_SENSOR = DHT22(SENSOR_DHT22_PIN)
+            temp_c, temp_f, humidity, is_valid = DHT_SENSOR.read().values()
+            is_valid = "False" if temp_c == 0.0 or temp_f == 0.0 or humidity == 0.0 else str(is_valid)
+
+            # If the reading is valid, return the values
+            if is_valid == "True":
+                return temp_c, temp_f, humidity, is_valid
+        except Exception as ex:
+            pass  # Continue to the next retry
+
+        counter += 1
+
+    # If all retries fail, set all values to "None"
+    return "None", "None", "None", "None"
+
+
+def read_senseHat():
+    counter = 0
+    while counter < MAX_RETRIES:
+        try:
+            # Read temperature, humidity from Sense Hat
+            sense = SenseHat()
+            sense.clear()
+            temp_c = sense.get_temperature()
+            temp_f = temp_c * 9 / 5 + 32
+            humidity = sense.get_humidity()
+
+            is_valid = "False" if temp_c == 0.0 or temp_f == 0.0 or humidity == 0.0 else "True"
+
+            # If the reading is valid, return the values
+            if is_valid == "True":
+                return temp_c, temp_f, humidity, is_valid
+        except Exception as ex:
+            print(ex)
+            pass  # Continue to the next retry
+
+        counter += 1
+
+    # If all retries fail, set all values to "None"
+    return "None", "None", "None", "None"
 
 
 def main():
@@ -57,14 +93,13 @@ def main():
 
     # Get Sensor Info
     logger.info("Get Sensor Info")
-    temp_c, temp_f, humidity, valid = read_dht22_sensor()
-
-    # Retry if failed
-    counter = 1
-    while (valid == "None" or valid == "False") and counter < 5:
-        logger.info(counter, "Retry")
+    if SENSOR_DHT22_PIN is not False:
         temp_c, temp_f, humidity, valid = read_dht22_sensor()
-        counter += 1
+    elif SENSE_HAT is not False:
+        temp_c, temp_f, humidity, valid = read_senseHat()
+    else:
+        logger.error("No valid config")
+        return
 
     # Failed to measure -> exit
     if valid == "None" or valid == "False":
@@ -72,6 +107,7 @@ def main():
         return
 
     # Log currMeasurements
+    temp_c, temp_f, humidity = round(temp_c, 2), round(temp_f, 2), round(humidity, 2)
     currMeasurements = {"date": date_now, "temp_c": temp_c, "temp_f": temp_f, "humidity": humidity, "valid": valid}
     logger.info(currMeasurements)
 
@@ -90,6 +126,8 @@ def main():
     with open(SAVED_INFO_FILE, "w") as outFile:
         json.dump(list(reversed(data)), outFile, indent=2)
 
+    return
+
 
 if __name__ == "__main__":
     # Set Logging
@@ -99,10 +137,17 @@ if __name__ == "__main__":
 
     logger.info("----------------------------------------------------")
 
+    # Open the configuration file in read mode
+    CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+    with open(CONFIG_FILE) as inFile:
+        CONFIG = json.load(inFile)
+
     # Sensor Settings
     SAVED_INFO_FILE = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "saved_info.json"))
-    DHT_PIN = 14
-    DHT_SENSOR = DHT22(DHT_PIN)
+    hostname = str(socket.gethostname()).upper()
+    MAX_RETRIES = CONFIG["MAX_RETRIES"]
+    SENSOR_DHT22_PIN = CONFIG[hostname]["SENSOR_DHT22_PIN"]
+    SENSE_HAT = CONFIG[hostname]["SENSE_HAT"]
 
     try:
         main()
