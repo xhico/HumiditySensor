@@ -23,7 +23,7 @@ def read_sensor(sensor):
         dict: A dictionary containing sensor measurements.
     """
     counter = 0
-    info = {"datetime": str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M")), "temp_c": 0, "temp_f": 0, "humidity": 0}
+    info = {"date": str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M")), "temp_c": 0, "temp_f": 0, "humidity": 0}
 
     while any(val == 0 for val in info.values()):
         if sensor == "SenseHat":
