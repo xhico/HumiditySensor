@@ -8,8 +8,8 @@ import socket
 import traceback
 import logging
 from pigpio_dht import DHT22
-from Misc import get911, sendEmail
 from sense_hat import SenseHat
+from Misc import get911, sendEmail
 
 
 def read_sensor(sensor):
